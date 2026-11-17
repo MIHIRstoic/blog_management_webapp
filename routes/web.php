@@ -16,6 +16,7 @@ Route::middleware('admin')->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/admin/blogs/create', [AdminController::class, 'create'])->name('admin.blogs.create');
     Route::post('/admin/blogs', [AdminController::class, 'store'])->name('admin.blogs.store');
+    Route::get('/admin/blogs/{blog}', [AdminController::class, 'openEdit'])->name('admin.blogs.open-edit');
     Route::get('/admin/blogs/{blog}/edit', [AdminController::class, 'edit'])->name('admin.blogs.edit');
     Route::put('/admin/blogs/{blog}', [AdminController::class, 'update'])->name('admin.blogs.update');
     Route::delete('/admin/blogs/{blog}', [AdminController::class, 'destroy'])->name('admin.blogs.destroy');

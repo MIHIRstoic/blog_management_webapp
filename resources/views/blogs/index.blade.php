@@ -32,7 +32,7 @@
         <h1 style="font-size:1.8rem; margin:0.35rem 0;">JobYaari Blog Hub</h1>
         <p class="muted" style="color: #dbeafe;">Responsive blog listing with live category/date filtering using AJAX and jQuery.</p>
       </div>
-      <a class="btn secondary" href="{{ route('admin.login') }}">Admin Login</a>
+      <a class="btn secondary" href="{{ route('admin.login', [], false) }}">Admin Login</a>
     </div>
   </div>
 </div>
@@ -64,7 +64,7 @@
           <h3 style="margin:0.2rem 0 0.5rem;">{{ $blog->title }}</h3>
           <p class="muted" style="min-height: 48px;">{{ $blog->short_description }}</p>
           <p class="muted">Published {{ $blog->published_at?->format('M d, Y') }}</p>
-          <a class="btn" href="{{ route('blogs.show', $blog) }}">Read More</a>
+          <a class="btn" href="{{ route('blogs.show', $blog, false) }}">Read More</a>
         </div>
       </article>
     @endforeach
@@ -94,7 +94,7 @@
     }
 
     $('#applyFilter').on('click', function () {
-      $.getJSON('{{ route('blogs.filter') }}', {
+      $.getJSON('{{ route('blogs.filter', [], false) }}', {
         category: $('#categoryFilter').val(),
         date: $('#dateFilter').val()
       }, function (blogs) {
@@ -105,7 +105,7 @@
     $('#resetFilter').on('click', function () {
       $('#categoryFilter').val('All');
       $('#dateFilter').val('');
-      $.getJSON('{{ route('blogs.filter') }}', function (blogs) {
+      $.getJSON('{{ route('blogs.filter', [], false) }}', function (blogs) {
         renderBlogs(blogs);
       });
     });

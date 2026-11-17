@@ -11,7 +11,7 @@ class EnsureAdmin
     public function handle(Request $request, Closure $next)
     {
         if (!Session::get('admin_logged_in')) {
-            return redirect()->route('admin.login');
+            return redirect()->away(route('admin.login', [], false));
         }
 
         return $next($request);

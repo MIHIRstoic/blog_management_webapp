@@ -1,0 +1,530 @@
+{
+  "info": {
+    "name": "JobYaari Blog Management API and Web Routes",
+    "description": "Requests for all 13 application routes from routes/web.php. The app uses Laravel web sessions and CSRF protection. Run the login-form request first; Postman will capture the CSRF token and retain session cookies. Login before running admin requests. Set adminEmail and adminPassword in a local Postman environment and do not export credentials.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.test(\"Response status is successful\", function () { pm.response.to.have.status(200); });",
+          "pm.test(\"Response body is present\", function () { pm.expect(pm.response.text()).to.not.be.empty; });"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://psychic-computing-machine-v6vpgqg4qq5xfpvp9-8000.app.github.dev",
+      "type": "string",
+      "description": "Change to your local or forwarded app URL; no trailing slash."
+    },
+    {
+      "key": "adminEmail",
+      "value": "",
+      "type": "string",
+      "description": "Enter the test admin email in Postman; do not export credentials."
+    },
+    {
+      "key": "adminPassword",
+      "value": "",
+      "type": "string",
+      "description": "Enter the test admin password in a local Postman environment."
+    },
+    {
+      "key": "csrfToken",
+      "value": "",
+      "type": "string",
+      "description": "Captured from the login form request."
+    },
+    {
+      "key": "blogId",
+      "value": "",
+      "type": "string",
+      "description": "Automatically set by Create blog; otherwise set to an existing test blog ID. Leave blank to avoid modifying a seed blog accidentally."
+    },
+    {
+      "key": "category",
+      "value": "Result",
+      "type": "string",
+      "description": "Category filter value."
+    },
+    {
+      "key": "date",
+      "value": "2026-11-16",
+      "type": "string",
+      "description": "Date filter in YYYY-MM-DD format."
+    },
+    {
+      "key": "newTitle",
+      "value": "Postman QA Blog",
+      "type": "string",
+      "description": "Title for create request."
+    },
+    {
+      "key": "updatedTitle",
+      "value": "Updated Postman QA Blog",
+      "type": "string",
+      "description": "Title for update request."
+    },
+    {
+      "key": "newCategory",
+      "value": "Testing",
+      "type": "string",
+      "description": "Category for create/update requests."
+    },
+    {
+      "key": "newShortDescription",
+      "value": "Postman request collection test blog.",
+      "type": "string",
+      "description": "Summary for create/update requests."
+    },
+    {
+      "key": "newContent",
+      "value": "Created by the Postman QA collection.",
+      "type": "string",
+      "description": "Content for create/update requests."
+    },
+    {
+      "key": "imageUrl",
+      "value": "https://example.com/image.jpg",
+      "type": "string",
+      "description": "Optional image URL; use a valid URL or leave blank."
+    },
+    {
+      "key": "publishedAt",
+      "value": "2026-11-17",
+      "type": "string",
+      "description": "Publication date in YYYY-MM-DD format; may be blank."
+    }
+  ],
+  "item": [
+    {
+      "name": "Public blog",
+      "item": [
+        {
+          "name": "Homepage",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/html,application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/"
+          }
+        },
+        {
+          "name": "Filter blogs (category and date)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/html,application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/blogs/filter?category={{category}}&date={{date}}"
+          }
+        },
+        {
+          "name": "Blog details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/html,application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/blogs/{{blogId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin authentication",
+      "item": [
+        {
+          "name": "Get login form and capture CSRF token",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/html,application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/login"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const tokenMatch = pm.response.text().match(/name=\"_token\" value=\"([^\"]+)\"/);",
+                  "pm.test(\"Login form contains a CSRF token\", function () { pm.expect(tokenMatch).to.not.be.null; });",
+                  "if (tokenMatch) pm.collectionVariables.set(\"csrfToken\", tokenMatch[1]);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Submit admin login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/html,application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/login",
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "_token",
+                  "value": "{{csrfToken}}",
+                  "type": "text"
+                },
+                {
+                  "key": "email",
+                  "value": "{{adminEmail}}",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "{{adminPassword}}",
+                  "type": "text"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin blog management (login first)",
+      "item": [
+        {
+          "name": "Admin dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/html,application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/dashboard"
+          }
+        },
+        {
+          "name": "Create blog form",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/html,application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/blogs/create"
+          }
+        },
+        {
+          "name": "Reject blog with missing title",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/html,application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/blogs",
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "_token",
+                  "value": "{{csrfToken}}",
+                  "type": "text"
+                },
+                {
+                  "key": "category",
+                  "value": "Testing",
+                  "type": "text"
+                },
+                {
+                  "key": "short_description",
+                  "value": "Invalid test blog",
+                  "type": "text"
+                },
+                {
+                  "key": "content",
+                  "value": "This request must not create a blog.",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Missing title returns its validation error\", function () { pm.expect(pm.response.text()).to.include(\"The title field is required.\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create blog",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/html,application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/blogs",
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "_token",
+                  "value": "{{csrfToken}}",
+                  "type": "text"
+                },
+                {
+                  "key": "title",
+                  "value": "{{newTitle}}",
+                  "type": "text"
+                },
+                {
+                  "key": "category",
+                  "value": "{{newCategory}}",
+                  "type": "text"
+                },
+                {
+                  "key": "short_description",
+                  "value": "{{newShortDescription}}",
+                  "type": "text"
+                },
+                {
+                  "key": "content",
+                  "value": "{{newContent}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "value": "{{imageUrl}}",
+                  "type": "text"
+                },
+                {
+                  "key": "published_at",
+                  "value": "{{publishedAt}}",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"newTitle\", \"Postman QA Blog \" + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const title = pm.collectionVariables.get(\"newTitle\");",
+                  "const dashboardHtml = pm.response.text();",
+                  "const titleIndex = dashboardHtml.indexOf(\"<td>\" + title + \"</td>\");",
+                  "const match = titleIndex < 0 ? null : dashboardHtml.slice(titleIndex).match(/href=\"\\/admin\\/blogs\\/(\\d+)\\/edit\"/);",
+                  "pm.test(\"Created blog appears on the dashboard\", function () { pm.expect(match).to.not.be.null; });",
+                  "if (match) {",
+                  "  pm.collectionVariables.set(\"blogId\", match[1]);",
+                  "  if (pm.environment.has(\"blogId\")) pm.environment.set(\"blogId\", match[1]);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Open blog edit shortcut (redirects to edit form)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/html,application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/blogs/{{blogId}}"
+          }
+        },
+        {
+          "name": "Edit blog form",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/html,application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/blogs/{{blogId}}/edit"
+          }
+        },
+        {
+          "name": "Update blog",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/html,application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/blogs/{{blogId}}",
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "_token",
+                  "value": "{{csrfToken}}",
+                  "type": "text"
+                },
+                {
+                  "key": "title",
+                  "value": "{{updatedTitle}}",
+                  "type": "text"
+                },
+                {
+                  "key": "category",
+                  "value": "{{newCategory}}",
+                  "type": "text"
+                },
+                {
+                  "key": "short_description",
+                  "value": "{{newShortDescription}}",
+                  "type": "text"
+                },
+                {
+                  "key": "content",
+                  "value": "{{newContent}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "value": "{{imageUrl}}",
+                  "type": "text"
+                },
+                {
+                  "key": "published_at",
+                  "value": "{{publishedAt}}",
+                  "type": "text"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete blog",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/html,application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/blogs/{{blogId}}",
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "_token",
+                  "value": "{{csrfToken}}",
+                  "type": "text"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin logout",
+      "item": [
+        {
+          "name": "Log out",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/html,application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/logout",
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "_token",
+                  "value": "{{csrfToken}}",
+                  "type": "text"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

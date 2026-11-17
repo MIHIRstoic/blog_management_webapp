@@ -19,7 +19,7 @@
   <div class="card">
     <h2 style="margin-top:0;">Admin Login</h2>
     <p style="color:#bfdbfe;">Use admin@jobyaari.dev / admin12345.</p>
-    <form method="POST" action="{{ route('admin.login.post') }}">
+    <form method="POST" action="{{ route('admin.login.post', [], false) }}">
       @csrf
       <input name="email" type="email" placeholder="Email" required>
       <input name="password" type="password" placeholder="Password" required>
@@ -28,7 +28,7 @@
     @if($errors->any())
       <div class="error">{{ $errors->first() }}</div>
     @endif
-    <p style="margin-top:1rem;"><a href="{{ route('blogs.index') }}">Back to public blog page</a></p>
+    <p style="margin-top:1rem;"><a href="{{ route('blogs.index', [], false) }}">Back to public blog page</a></p>
   </div>
 </div>
 </body>

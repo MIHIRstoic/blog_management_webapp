@@ -24,8 +24,8 @@
       <p style="margin:0.15rem 0 0; color:#bfdbfe;">Manage blogs, add new content, and update categories.</p>
     </div>
     <div>
-      <a class="btn secondary" href="{{ route('admin.blogs.create') }}">Add Blog</a>
-      <form method="POST" action="{{ route('admin.logout') }}" style="display:inline;">
+      <a class="btn secondary" href="{{ route('admin.blogs.create', [], false) }}">Add Blog</a>
+      <form method="POST" action="{{ route('admin.logout', [], false) }}" style="display:inline;">
         @csrf
         <button class="btn secondary" type="submit">Logout</button>
       </form>
@@ -47,8 +47,8 @@
           <td>{{ $blog->category }}</td>
           <td>{{ $blog->published_at?->format('M d, Y') }}</td>
           <td>
-            <a class="btn secondary" href="{{ route('admin.blogs.edit', $blog) }}">Edit</a>
-            <form action="{{ route('admin.blogs.destroy', $blog) }}" method="POST" style="display:inline;" onsubmit="return confirm('Delete this blog?');">
+            <a class="btn secondary" href="{{ route('admin.blogs.edit', $blog, false) }}">Edit</a>
+            <form action="{{ route('admin.blogs.destroy', $blog, false) }}" method="POST" style="display:inline;" onsubmit="return confirm('Delete this blog?');">
               @csrf
               @method('DELETE')
               <button class="btn danger" type="submit">Delete</button>

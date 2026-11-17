@@ -23,7 +23,7 @@ class AdminController extends Controller
         if ($credentials['email'] === 'admin@jobyaari.dev' && $credentials['password'] === 'admin12345') {
             Session::put('admin_logged_in', true);
 
-            return redirect()->route('admin.dashboard');
+            return redirect()->away(route('admin.dashboard', [], false));
         }
 
         return back()->withErrors(['email' => 'Invalid admin credentials.']);
@@ -33,7 +33,7 @@ class AdminController extends Controller
     {
         Session::forget('admin_logged_in');
 
-        return redirect()->route('admin.login');
+        return redirect()->away(route('admin.login', [], false));
     }
 
     public function dashboard()
@@ -61,12 +61,18 @@ class AdminController extends Controller
 
         Blog::create($data);
 
-        return redirect()->route('admin.dashboard')->with('success', 'Blog added successfully.');
+        return redirect()->away(route('admin.dashboard', [], false))
+            ->with('success', 'Blog added successfully.');
     }
 
     public function edit(Blog $blog)
     {
         return view('admin.form', compact('blog'));
+    }
+
+    public function openEdit(Blog $blog)
+    {
+        return redirect()->away(route('admin.blogs.edit', $blog, false));
     }
 
     public function update(Request $request, Blog $blog)
@@ -82,13 +88,15 @@ class AdminController extends Controller
 
         $blog->update($data);
 
-        return redirect()->route('admin.dashboard')->with('success', 'Blog updated successfully.');
+        return redirect()->away(route('admin.dashboard', [], false))
+            ->with('success', 'Blog updated successfully.');
     }
 
     public function destroy(Blog $blog)
     {
         $blog->delete();
 
-        return redirect()->route('admin.dashboard')->with('success', 'Blog deleted successfully.');
+        return redirect()->away(route('admin.dashboard', [], false))
+            ->with('success', 'Blog deleted successfully.');
     }
 }

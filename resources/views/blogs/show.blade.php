@@ -17,7 +17,7 @@
 <body>
 <div class="hero">
   <div class="container">
-    <a class="btn" href="{{ route('blogs.index') }}" style="background:#e5eefc; color:#17324d;">← Back to blogs</a>
+    <a class="btn" href="{{ route('blogs.index', [], false) }}" style="background:#e5eefc; color:#17324d;">← Back to blogs</a>
     <h1 style="margin-bottom:0.25rem;">{{ $blog->title }}</h1>
     <p style="color:#dbeafe;">{{ $blog->category }} • {{ $blog->published_at?->format('M d, Y') }}</p>
   </div>
