@@ -2,16 +2,18 @@
 
 ## QA results on master
 
+QA target for this run: `http://127.0.0.1:8000`.
+
 | Check | Command | Literal output |
 |---|---|---|
 | HTTP route matrix | `for path in / /blogs/filter '/blogs/filter?category=Unknown' /blogs/1 /blogs/999999 /admin/login /admin/dashboard; do printf '%s ' "$path"; curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:8000$path"; printf '\n'; done` | `/ 200`<br>`/blogs/filter 200`<br>`/blogs/filter?category=Unknown 200`<br>`/blogs/1 200`<br>`/blogs/999999 404`<br>`/admin/login 200`<br>`/admin/dashboard 302` |
-| Newman collection | `npx --yes newman run postman/blog-management.postman_collection.json --env-var baseUrl=http://127.0.0.1:8000 -r cli` | `│              requests │                14 │                0 │`<br>`│            assertions │                31 │                7 │` (exit status `1`) |
+| Newman collection | `npx --yes newman run postman/blog-management.postman_collection.json --env-var baseUrl=http://127.0.0.1:8000 --env-var "adminEmail=$QA_ADMIN_EMAIL" --env-var "adminPassword=$QA_ADMIN_PASSWORD" --env-var blogId=$QA_EXISTING_BLOG_ID -r cli` | `│              requests │                14 │                0 │`<br>`│            assertions │                31 │                0 │` (exit status `0`) |
 | Laravel tests | `php artisan test` | `Tests:    11 passed (76 assertions)` |
 | `qa.md` test-case rows by Status | `awk -F'|' '/^\| [A-Z]+-[0-9]+ \|/ { status=$8; gsub(/^[ \t]+|[ \t]+$/, "", status); count[status]++; total++ } END { printf "test-case rows: %d\n", total; for (status in count) printf "%s: %d\n", status, count[status] }' qa.md` | `test-case rows: 48`<br>`Pass: 48` |
-| SQLite blog rows before creation | `sqlite3 /tmp/blog-management-master-qa.sqlite 'SELECT count(*) FROM blogs;'` | `0` |
-| SQLite blog rows after creating one blog | `sqlite3 /tmp/blog-management-master-qa.sqlite 'SELECT count(*) FROM blogs;'` | `1` |
+| SQLite blog rows before one additional blog creation | `sqlite3 /tmp/blog-management-reconcile.sqlite 'SELECT count(*) FROM blogs;'` | `1` |
+| SQLite blog rows after one additional blog creation | `sqlite3 /tmp/blog-management-reconcile.sqlite 'SELECT count(*) FROM blogs;'` | `2` |
 
-Related reports: [QA inventory](./qa.md) · [confirmed defects](./test-artifacts/defects.md) · [detailed results](./test-artifacts/results.md).
+Detailed test outputs and the diagnosis of the earlier seven Newman failures are in [test-artifacts/results.md](./test-artifacts/results.md). Related reports: [QA inventory](./qa.md) · [confirmed defects](./test-artifacts/defects.md).
 
 ## About
 

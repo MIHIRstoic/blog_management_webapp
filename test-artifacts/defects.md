@@ -1,9 +1,8 @@
 # Confirmed Defects
 
-All reproductions below were run against a local Laravel server at
-`127.0.0.1:8765` with an isolated, temporary SQLite database. No remote
-service was contacted. The credential value and session cookie contents are
-redacted/not recorded.
+All reproductions below were run at `BASE_URL=http://127.0.0.1:8000` against an
+isolated, temporary SQLite database. No remote service was contacted. The
+credential value and session cookie contents are redacted/not recorded.
 
 ## D1 — Hardcoded administrator credentials
 
@@ -52,9 +51,9 @@ redacted/not recorded.
 - **Severity:** Medium
 - **Priority:** P2
 - **Steps:**
-  1. `curl -c jar.txt http://127.0.0.1:8765/admin/login` and extract the form
+  1. `curl -c jar.txt "$BASE_URL/admin/login"` and extract the form
      CSRF token.
-  2. POST the valid credentials to `/admin/login` using the same cookie jar.
+  2. POST the valid credentials to `"$BASE_URL/admin/login"` using the same cookie jar.
   3. Compare the `laravel_session` values from the jar before and after login,
      decrypting them to compare the underlying session IDs.
 - **Expected:** The session ID changes after successful authentication.
@@ -93,7 +92,7 @@ redacted/not recorded.
 - **Evidence:**
 
   Command: a 30-iteration sequential `curl` loop posting an incorrect password
-  to `http://127.0.0.1:8765/admin/login` with the form CSRF token and cookie jar.
+  to `"$BASE_URL/admin/login"` with the form CSRF token and cookie jar.
 
   Literal output:
 
@@ -119,7 +118,7 @@ redacted/not recorded.
 - **Evidence:**
 
   Command: POST the blog fields (including `published_at=2027-01-01`) to
-  `/admin/blogs`, then `curl http://127.0.0.1:8765/`.
+  `"$BASE_URL/admin/blogs"`, then `curl "$BASE_URL/"`.
 
   Literal output:
 

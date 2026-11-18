@@ -108,13 +108,14 @@ The 48 cases below cover the four selected features. Expected results are define
 
 ## Run and summary
 
+- **QA target:** Local app at `127.0.0.1:8000`.
 - Expected results were recorded in this plan before running the new expanded cases.
 - **Web cases:** 48 unique cases run in Chrome 159.0.8154.6, Firefox 159.0, and Edge 157.0.4341.60: **144/144 passed, 0 failed**. Actual results and statuses are recorded in the table above.
-- **API collection:** 14 requests and 31 assertions run with Newman against the isolated app: **14/14 requests passed, 0 failed**. Responses were checked for successful status and non-empty body; the missing-title request verified the validation error.
+- **API collection:** 14 requests and 31 assertions run with Newman against the isolated app: **14/14 requests passed, 31/31 assertions passed**. Responses were checked for successful status and non-empty body; the missing-title request verified the validation error. The initial run had seven failures because the invocation left `adminEmail`, `adminPassword`, and the initial `blogId` blank. The collection passed after supplying the required local credentials and a disposable existing blog ID; the request methods and paths match the routes.
 - **Laravel tests:** `php artisan test` — **11 passed, 0 failed (76 assertions)**.
 - **Database:** Create, update, and delete behavior was checked against an isolated SQLite database; created and updated values matched the submitted values. The repository's `database/database.sqlite` was not modified.
 - **Acceptance:** Public listing/filtering, blog details, admin authentication, and blog CRUD are all **Met** for the tested desktop browser environments.
-- **Defects:** **0 Critical, 0 Major, 0 Minor; 0 fixed and verified; 0 open.** No application test failed, so no screenshot evidence or Trello defect cards were needed. The first Newman attempt exposed a collection-script variable collision; the script was corrected and the complete collection passed on rerun.
+- **Defects:** **0 Critical, 2 High, 2 Medium, 0 Low; 4 total.** All four confirmed defects remain open. Reproduction steps and command/output evidence for each are documented in [test-artifacts/defects.md](./test-artifacts/defects.md).
 - **Next:** Run responsive/mobile viewport checks and repeat the write checks against the intended deployed environment. No Android device or mobile visual inspection was part of this run.
 
 ## Empty and invalid API input recheck
