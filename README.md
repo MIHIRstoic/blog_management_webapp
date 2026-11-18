@@ -1,5 +1,20 @@
 # JobYaari Blog Management System
 
+## QA results on master
+
+| Check | Command | Literal output |
+|---|---|---|
+| HTTP route matrix | `for path in / /blogs/filter '/blogs/filter?category=Unknown' /blogs/1 /blogs/999999 /admin/login /admin/dashboard; do printf '%s ' "$path"; curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:8000$path"; printf '\n'; done` | `/ 200`<br>`/blogs/filter 200`<br>`/blogs/filter?category=Unknown 200`<br>`/blogs/1 200`<br>`/blogs/999999 404`<br>`/admin/login 200`<br>`/admin/dashboard 302` |
+| Newman collection | `npx --yes newman run postman/blog-management.postman_collection.json --env-var baseUrl=http://127.0.0.1:8000 -r cli` | `│              requests │                14 │                0 │`<br>`│            assertions │                31 │                7 │` (exit status `1`) |
+| Laravel tests | `php artisan test` | `Tests:    11 passed (76 assertions)` |
+| `qa.md` test-case rows by Status | `awk -F'|' '/^\| [A-Z]+-[0-9]+ \|/ { status=$8; gsub(/^[ \t]+|[ \t]+$/, "", status); count[status]++; total++ } END { printf "test-case rows: %d\n", total; for (status in count) printf "%s: %d\n", status, count[status] }' qa.md` | `test-case rows: 48`<br>`Pass: 48` |
+| SQLite blog rows before creation | `sqlite3 /tmp/blog-management-master-qa.sqlite 'SELECT count(*) FROM blogs;'` | `0` |
+| SQLite blog rows after creating one blog | `sqlite3 /tmp/blog-management-master-qa.sqlite 'SELECT count(*) FROM blogs;'` | `1` |
+
+Related reports: [QA inventory](./qa.md) · [confirmed defects](./test-artifacts/defects.md) · [detailed results](./test-artifacts/results.md).
+
+## About
+
 JobYaari is a Laravel blog app for publishing and browsing articles. Visitors can filter the public listing by category and date, open full article pages, and administrators can sign in to create, edit, and delete posts.
 
 ## Features
@@ -30,9 +45,7 @@ JobYaari is a Laravel blog app for publishing and browsing articles. Visitors ca
 - Public site: http://127.0.0.1:8000/
 - Admin panel: http://127.0.0.1:8000/admin/login
 
-## Verification
-
-### Automated tests
+## Re-run checks
 
 Run the Laravel unit and feature tests from the project root:
 
@@ -40,29 +53,18 @@ Run the Laravel unit and feature tests from the project root:
 php artisan test
 ```
 
-The test suite uses an in-memory SQLite database. It does not modify the local application database.
-
-To run the API/web-route collection against a local app, first start the app and use a **disposable database** because the collection creates, updates, and deletes a blog:
+The test suite uses an in-memory SQLite database. Run the Newman collection
+against a disposable database because it creates, updates, and deletes a blog:
 
 ```bash
 npx --yes newman run postman/blog-management.postman_collection.json \
   --env-var "baseUrl=http://127.0.0.1:8000" \
   --env-var "adminEmail=$QA_ADMIN_EMAIL" \
   --env-var "adminPassword=$QA_ADMIN_PASSWORD" \
-  --env-var "blogId=$QA_EXISTING_BLOG_ID"
+  --env-var "blogId=$QA_EXISTING_BLOG_ID" \
+  -r cli
 ```
 
-Set the three `QA_*` variables in your local shell. `QA_EXISTING_BLOG_ID` must identify a disposable test blog for the collection's initial detail request. The collection captures its CSRF token and the created blog ID during the run. Do not commit credentials or use a production database.
-
-### Recorded QA results
-
-Results from 2026-11-17:
-
-- Laravel tests: **11 passed, 76 assertions**.
-- Browser matrix: **48 cases run in Chrome, Firefox, and Edge; 144/144 executions passed**. The case-by-case results are in [`qa.md`](./qa.md) and [`test-cases/qa-test-log.xlsx`](./test-cases/qa-test-log.xlsx).
-- Newman collection: **14 requests, 31 assertions, 0 failures**.
-- Empty and malformed input recheck: no server errors or invalid writes. The report notes that array-shaped filters are accepted and invalid login uses the normal redirect response.
-- No application defects were found. Mobile/responsive device testing was not performed.
-- Controlled mutation demonstrations temporarily introduced and reverted one failing regression per feature category; details and observed failures are clearly labeled as simulated in [`qa.md`](./qa.md).
-
-The browser matrix used a temporary Playwright harness that is not included in the repository; the browser cases can be followed from the QA log, but there is currently no checked-in command to replay that matrix automatically.
+Set the `QA_*` variables in your local shell. `QA_EXISTING_BLOG_ID` must refer
+to a disposable blog for the collection's initial detail request. Do not
+commit credentials or use a production database.
