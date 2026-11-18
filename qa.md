@@ -116,6 +116,8 @@ The 48 cases below cover the four selected features. Expected results are define
 - **Database:** Create, update, and delete behavior was checked against an isolated SQLite database; created and updated values matched the submitted values. The repository's `database/database.sqlite` was not modified.
 - **Acceptance:** Public listing/filtering, blog details, admin authentication, and blog CRUD are all **Met** for the tested desktop browser environments.
 - **Defects:** **0 Critical, 2 High, 2 Medium, 0 Low; 4 total.** All four confirmed defects remain open. Reproduction steps and command/output evidence for each are documented in [test-artifacts/defects.md](./test-artifacts/defects.md).
+- **Coverage gap:** the four defects were found by exploratory testing outside the 48 scripted
+  cases. The suite does not cover authentication security, session handling, or scheduled publishing.
 - **Next:** Run responsive/mobile viewport checks and repeat the write checks against the intended deployed environment. No Android device or mobile visual inspection was part of this run.
 
 ## Empty and invalid API input recheck
